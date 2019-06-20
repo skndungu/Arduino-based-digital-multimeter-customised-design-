@@ -17,9 +17,8 @@ void setup()
 
     //////////////////////////////////
     //////// VOLTAGE DC /////////////
-    for( this_dc_reading = 0; this_dc_reading < dc_raw_value_num__readings; this_dc_reading ++) {
-    dc_readings= 0;
-  }
+
+     
 
 
     /////////////////////////////
@@ -40,7 +39,10 @@ void setup()
     display.setTextColor(WHITE);
     display.setCursor(5,0);
     display.print("Vion Meter");
-
+    display.setCursor(49,10);
+    display.print("Welcome !");
+    display.setCursor(23,20);
+    display.print("Select to measure");
     // update display with all of the above graphics
     display.display();
 }
@@ -51,7 +53,7 @@ void loop()
    button_selection_count();
    change_measurement_param();
 
-   measure_vdc();
+//   measure_vdc();
 }
 
 
@@ -147,9 +149,9 @@ void display_oled_voltage_ac(){
  
   // display a line of text
   display.clearDisplay();
-    display.setCursor(5,0);
-  display.print("Vion Meter");
+  display.setCursor(5,0);
   display.setTextSize(1);
+  display.print("Vion Meter");
   display.setTextColor(WHITE);
   display.setCursor(75,0);
   display.print("V AC");
@@ -216,43 +218,24 @@ void display_oled_continuity(){
     //////// VOLTAGE DC /////////////
 
 void measure_vdc(){
-  
-   // subtract the last reading:
-  total_dc_readings = total_dc_readings - dc_readings;
-  
-  // read from the sensor:
-  dc_readings = analogRead(dc_measurement);
-
-  total_dc_readings = total_dc_readings + dc_readings;
-  
-  dc_readings_index = dc_readings_index + 1;
-
-  if(dc_readings_index >= dc_raw_value_num__readings){
-    dc_readings_index = 0;
-  }
-
-  average_dc_readings = total_dc_readings / dc_raw_value_num__readings;
-
-   Serial.println(average_dc_readings);
-   
-//  mapped_raw_value = map(dc_raw_value, 0, 1023, 0, 255);
-
-//  Serial.println(mapped_raw_value );
+  dc_raw_value = analogRead(dc_measurement);
+  mapped_raw_value = map(dc_raw_value, 0, 1023, 0, 255);
+  Serial.println(mapped_raw_value );
   
   dc_voltage_out = (mapped_raw_value * (float)reference_voltage_val) / reference_decimal_val;
-//  Serial.println(dc_voltage_out);
+  Serial.println(dc_voltage_out);
   
   resistance_ratio = resistor_R2 / (resistor_R1 + resistor_R2);
 
   dc_actual_voltage = dc_voltage_out / resistance_ratio;
-//  Serial.println(dc_actual_voltage);
-   delay(300);
+  Serial.println(dc_actual_voltage);
+//   delay(300);
 
 
   display.clearDisplay();
   display.setCursor(5,0);
-  display.print("Vion Meter");
   display.setTextSize(1);
+  display.print("Vion Meter");
   display.setTextColor(WHITE);
   display.setCursor(75,0);
   display.print("V DC");

@@ -31,7 +31,6 @@ int buzzer_value;
 // Pin  declarations
 const int dc_measurement = A2;
 
-
 // Vairables
 
 float dc_raw_value = 0.0;
@@ -45,21 +44,3 @@ float reference_decimal_val =255;
 float resistor_R1 = 1000000;
 float resistor_R2 = 100000;
 float resistance_ratio = 0.0;
-
-
-const int dc_raw_value_num__readings = 10;
-int dc_readings_index = 0;
-int dc_readings = 0;
-int total_dc_readings = 0;
-int average_dc_readings = 0;
-int this_dc_reading = 0; 
-
-
-
-
-
-
-
-
-
-

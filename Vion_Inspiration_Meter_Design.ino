@@ -28,8 +28,9 @@ void setup()
 
   /////////////////////////////
   ///////OPTIONS BUTTON////////
-  pinMode(selection_btn, INPUT_PULLUP); // initialize pin as an input
-
+  pinMode(selection_btn, INPUT_PULLUP);        // initialize pin as an input
+  pinMode(selection_btn_mode,INPUT_PULLUP);   //  initialize pin as an input
+ 
   /////////////////////////////
   /////OLED INITIALIZATION//////
 
@@ -42,7 +43,7 @@ void setup()
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(5, 0);
-  display.print("Vion Meter");
+  display.print("SMARTPEN");
   display.setCursor(49, 10);
   display.print("Welcome !");
   display.setCursor(23, 20);
@@ -56,6 +57,7 @@ void loop()
   button_states();
   button_selection_count();
   change_measurement_param();
+  change_measurement_mode_param();
 }
 
 //////////////////////////////////
@@ -74,7 +76,9 @@ void continuty_test()
 void button_states()
 {
   selection_btn_value = digitalRead(selection_btn);
+  selection_btn_mode_value = digitalRead(selection_btn_mode);
   //   Serial.println(selection_btn_value);
+  //   Serial.println(selection_mode_btn_value);
 }
 
 int button_selection_count()
@@ -94,30 +98,55 @@ int button_selection_count()
   last_selection_btn_value = selection_btn_value;
 }
 
+
+int button_selection_mode_count()
+{
+  button_states();
+
+  if (selection_btn_mode_value != last_selection_btn_mode_value)
+  {
+    if (selection_btn_mode_value == 1)
+    {
+      button_mode_press = true;
+      selection_mode_count++;
+      Serial.println(selection_mode_count);
+    }
+    delay(10);
+  }
+  last_selection_btn_mode_value = selection_btn_mode_value;
+}
+
+
+
+
 void change_measurement_param()
 {
   button_selection_count();
   measure_resistor();
   if (selection_count == 1)
   {
+    selection_mode_count = 0;
     // Voltage Measurement
     display_oled_voltage_dc();
     Serial.println("Voltage");
   }
   if (selection_count == 2)
   {
+    selection_mode_count = 0;
     // Voltage Measurement
     display_oled_voltage_ac();
     Serial.println("Voltage");
   }
   if (selection_count == 3)
   {
+    selection_mode_count = 0;
     // Current Measurement
     display_oled_current();
     Serial.println("Current");
   }
   if (selection_count == 4)
   {
+     selection_mode_count = 0;
     // Continuity test
     display_oled_continuity();
     Serial.println("Continuity");
@@ -125,6 +154,7 @@ void change_measurement_param()
 
   if (selection_count == 5)
   {
+    selection_mode_count = 0;
     //Resistnace Measurement
     channel_2K_state = true;
     Serial.println("Resistance");
@@ -171,9 +201,48 @@ void change_measurement_param()
   {
     // Reset Count
     selection_count = 1;
-    display_oled_voltage_dc();
   }
 }
+
+
+void change_measurement_mode_param() 
+{
+    button_selection_mode_count();
+
+    if(selection_mode_count == 1) {
+      selection_count = 0;
+      comparing_mode = true; 
+      display_comparing_mode();
+    }
+
+
+    if(selection_mode_count == 2) {
+      selection_count = 0;
+      backlight_mode = true; 
+      display_backlight_mode();
+    }
+
+    if(selection_mode_count == 3) {
+      selection_count = 0;
+      real_value_mode = true; 
+      display_real_value_mode();
+    } 
+
+    if(selection_mode_count == 4) {
+      selection_count = 0;
+      continuity_mode = true; 
+      display_continuity_mode();
+    } else {
+      continuity_mode = false;
+    }
+
+    if(selection_mode_count > 4) {
+      selection_count = 0;
+      selection_mode_count = 1;
+    }
+}
+
+
 
 void display_oled_voltage_dc()
 {
@@ -181,7 +250,8 @@ void display_oled_voltage_dc()
   // display a line of text
   display.clearDisplay();
   display.setCursor(5, 0);
-  display.print("Vion Meter");
+  display.setTextSize(1);
+  display.print("SMARTPEN");
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(75, 0);
@@ -197,7 +267,7 @@ void display_oled_voltage_ac()
   display.clearDisplay();
   display.setCursor(5, 0);
   display.setTextSize(1);
-  display.print("Vion Meter");
+  display.print("SMARTPEN");
   display.setTextColor(WHITE);
   display.setCursor(75, 0);
   display.print("V AC");
@@ -212,13 +282,14 @@ void display_oled_current()
   // display a line of text
   display.clearDisplay();
   display.setCursor(5, 0);
-  display.print("Vion Meter");
+  display.setTextSize(1);
+  display.print("SMARTPEN");
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(75, 0);
   display.print("A");
 
-  measure_current();
+//  measure_current();
   // update display with all of the above
   display.display();
 }
@@ -229,7 +300,7 @@ void display_oled_continuity()
   // display a line of text
   display.clearDisplay();
   display.setCursor(5, 0);
-  display.print("Vion Meter");
+  display.print("SMARTPEN");
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(75, 0);
@@ -249,7 +320,8 @@ void display_oled_resistance()
   // display a line of text
   display.clearDisplay();
   display.setCursor(5, 0);
-  display.print("Vion Meter");
+  display.setTextSize(1);
+  display.print("SMARTPEN");
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(75, 0);
@@ -265,7 +337,7 @@ void display_oled_resistance_channel_2K()
   // display a line of text
   display.clearDisplay();
   display.setCursor(5, 0);
-  display.print("Vion Meter");
+  display.print("SMARTPEN");
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(75, 0);
@@ -288,7 +360,7 @@ void display_oled_resistance_channel_20K()
   // display a line of text
   display.clearDisplay();
   display.setCursor(5, 0);
-  display.print("Vion Meter");
+  display.print("SMARTPEN");
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(75, 0);
@@ -311,7 +383,7 @@ void display_oled_resistance_channel_200K()
   // display a line of text
   display.clearDisplay();
   display.setCursor(5, 0);
-  display.print("Vion Meter");
+  display.print("SMARTPEN");
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(75, 0);
@@ -333,7 +405,7 @@ void display_oled_resistance_channel_1M()
   // display a line of text
   display.clearDisplay();
   display.setCursor(5, 0);
-  display.print("Vion Meter");
+  display.print("SMARTPEN");
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(75, 0);
@@ -371,7 +443,7 @@ void measure_vdc()
   display.clearDisplay();
   display.setCursor(5, 0);
   display.setTextSize(1);
-  display.print("Vion Meter");
+  display.print("SMARTPEN");
   display.setTextColor(WHITE);
   display.setCursor(75, 0);
   display.print("V DC");
@@ -379,6 +451,8 @@ void measure_vdc()
   display.setCursor(40, 15);
   display.print(dc_actual_voltage);
   display.print("V");
+
+  display.display();
 }
 
 void measure_current()
@@ -398,7 +472,7 @@ void measure_current()
   display.clearDisplay();
   display.setCursor(5, 0);
   display.setTextSize(1);
-  display.print("Vion Meter");
+  display.print("SMARTPEN");
   display.setTextColor(WHITE);
   display.setCursor(75, 0);
   display.print("A");
@@ -621,7 +695,7 @@ void display_ol_change_scale_2K()
   // display a line of text
   display.clearDisplay();
   display.setCursor(5, 0);
-  display.print("Vion Meter");
+  display.print("SMARTPEN");
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(75, 0);
@@ -643,7 +717,7 @@ void display_ol_change_scale_20K()
   // display a line of text
   display.clearDisplay();
   display.setCursor(5, 0);
-  display.print("Vion Meter");
+  display.print("SMARTPEN");
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(75, 0);
@@ -665,7 +739,7 @@ void display_ol_change_scale_200K()
   // display a line of text
   display.clearDisplay();
   display.setCursor(5, 0);
-  display.print("Vion Meter");
+  display.print("SMARTPEN");
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(75, 0);
@@ -687,7 +761,7 @@ void display_ol_change_scale_1M()
   // display a line of text
   display.clearDisplay();
   display.setCursor(5, 0);
-  display.print("Vion Meter");
+  display.print("SMARTPEN");
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(75, 0);
@@ -709,7 +783,7 @@ void display_zero_resistance_channel_2K()
   // display a line of text
   display.clearDisplay();
   display.setCursor(5, 0);
-  display.print("Vion Meter");
+  display.print("SMARTPEN");
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(75, 0);
@@ -731,7 +805,7 @@ void display_zero_resistance_channel_20K()
   // display a line of text
   display.clearDisplay();
   display.setCursor(5, 0);
-  display.print("Vion Meter");
+  display.print("SMARTPEN");
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(75, 0);
@@ -753,7 +827,7 @@ void display_zero_resistance_channel_200K()
   // display a line of text
   display.clearDisplay();
   display.setCursor(5, 0);
-  display.print("Vion Meter");
+  display.print("SMARTPEN");
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(75, 0);
@@ -775,7 +849,7 @@ void display_zero_resistance_channel_1M()
   // display a line of text
   display.clearDisplay();
   display.setCursor(5, 0);
-  display.print("Vion Meter");
+  display.print("SMARTPEN");
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(75, 0);
@@ -786,6 +860,95 @@ void display_zero_resistance_channel_1M()
   display.print("200k - 1M");
   display.setCursor(42, 22);
   display.print("O.L M Ohms");
+
+  // update display with all of the above
+  display.display();
+}
+
+
+
+
+void display_comparing_mode()
+{
+
+  // display a line of text
+  display.clearDisplay();
+  display.setCursor(5, 0);
+  display.setTextSize(1);
+  display.print("SMARTPEN");
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(70, 0);
+  display.print("Comparing");
+  display.setCursor(15, 10);
+  display.print("Comparing mode");
+  display.setCursor(42, 22);
+  display.print("values...");
+
+  // update display with all of the above
+  display.display();
+}
+
+
+void display_backlight_mode()
+{
+
+  // display a line of text
+  display.clearDisplay();
+  display.setCursor(5, 0);
+  display.setTextSize(1);
+  display.print("SMARTPEN");
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(70, 0);
+  display.print("Backlight");
+  display.setCursor(15, 10);
+  display.print("Backlight mode");
+  display.setCursor(42, 22);
+  display.print("values...");
+
+  // update display with all of the above
+  display.display();
+}
+
+
+void display_real_value_mode()
+{
+
+  // display a line of text
+  display.clearDisplay();
+  display.setCursor(5, 0);
+  display.setTextSize(1);
+  display.print("SMARTPEN");
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(70, 0);
+  display.print("Real Val");
+  display.setCursor(15, 10);
+  display.print("Real Value mode");
+  display.setCursor(42, 22);
+  display.print("values...");
+
+  // update display with all of the above
+  display.display();
+}
+
+void display_continuity_mode()
+{
+
+  // display a line of text
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setCursor(5, 0);
+  display.print("SMARTPEN");
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(67, 0);
+  display.print("Continuity");
+  display.setCursor(15, 10);
+  display.print("Continuity mode");
+  display.setCursor(42, 22);
+  display.print("values...");
 
   // update display with all of the above
   display.display();

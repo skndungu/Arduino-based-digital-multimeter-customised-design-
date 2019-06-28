@@ -3,6 +3,7 @@
 
 // Pin  declarations
 const int selection_btn = 2;
+const int selection_btn_mode = 3;
 
 // Vairables
 
@@ -11,6 +12,16 @@ int last_selection_btn_value = 0;
 bool button_press = false;
 
 int selection_count = 0; // number of btn presses
+
+
+//BTN MODES
+
+int selection_btn_mode_value = 0;
+int last_selection_btn_mode_value = 0; 
+bool button_mode_press = false;
+
+int selection_mode_count = 0; // number of btn presses for the modes
+
 
 /////////////////////////////
 ////////CONTINUITY//////////
@@ -98,3 +109,15 @@ float channel_2K_value = 1000;
 float channel_20K_value = 20000;
 float channel_200K_value = 200000;
 float channel_1M_value = 1000000;
+
+
+
+
+/////////////////////////////
+////////// MODES ////////
+
+// variables 
+bool comparing_mode = false;
+bool backlight_mode = false;
+bool real_value_mode = false;
+bool continuity_mode = false;
